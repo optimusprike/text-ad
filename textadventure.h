@@ -15,8 +15,12 @@ class user
         string getObject();
         int getLives();
         void decreaseLives();
+        void decrementPoints();
+        void addPoints(int n);
+        int getPoints();
         void playerReset();
         void setTimeConstraints(int floor, double time);
+        void defaultTimeConstraints();
         double getThirdFloorTimeLimit();
         double getSecondFloorTimeLimit();
         double getFirstFloorTimeLimit();
@@ -25,6 +29,7 @@ class user
     private:
         string name;
         string object;
+        int points;
         int lives;
         double timeConstraints[3];
 };
@@ -36,6 +41,7 @@ class building
         void generateThirdFloor();
         void generateSecondFloor();
         void generateFirstFloor();
+        void generateBonusRound();
         user searchRoom(user player, string roomChoice);
     private:
         string rooms[8];
