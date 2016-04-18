@@ -6,6 +6,7 @@
 #include <ctime>
 #include <sstream>
 #include <limits>
+#include <fstream>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ user::user()
 {
     lives = 3;
     object = "";
+    points = 103;
     timeConstraints[0] = 60;
     timeConstraints[1] = 40;
     timeConstraints[2] = 30;
@@ -64,17 +66,44 @@ void user::decreaseLives()
     lives--;
 }
 
+// decrements points
+void user::decrementPoints()
+{
+    points--;
+}
+
+// updates the user's amount of points
+void user::addPoints(int n)
+{
+    points += n;
+}
+
+//returns the amount of points the user has
+int user::getPoints()
+{
+    return points;
+}
+
 // sets the user properties back to the way they started
 void user::playerReset()
 {
     lives = 3;
     object = "";
+    points = 103;
 }
 
 // assigns new values to game time constraints
 void user::setTimeConstraints(int floor, double time)
 {
     timeConstraints[floor] = time;
+}
+
+// set time limits back to how they were originally
+void user::defaultTimeConstraints()
+{
+    timeConstraints[0] = 60;
+    timeConstraints[1] = 40;
+    timeConstraints[2] = 30;
 }
 
 // returns the time it takes to escape the third floor
@@ -1396,11 +1425,13 @@ user building::searchRoom(user player, string roomChoice)
         {
             cout << endl;
             cout << "You don't have a key to open the door.";
+            player.decrementPoints();
             return player;
         }
         else if(player.getObject().compare("key") == 0)
         {
             player.setObject("winner");
+            player.decrementPoints();
             return player;
         }
         else if(player.getObject().compare("faux key") == 0)
@@ -1409,6 +1440,7 @@ user building::searchRoom(user player, string roomChoice)
             cout << "Oh no! Your key doesn't work for this door.";
             cout << endl;
             cout << "You will have to continue your search for the right key.";
+            player.decrementPoints();
             return player;
         }
     }
@@ -1434,9 +1466,11 @@ void StartMenu()
 	cout << endl;
     cout << "3. Settings";
 	cout << endl;
-	cout << "4. Credits";
+	cout << "4. Highscores";
 	cout << endl;
-	cout << "5. Quit";
+	cout << "5. Credits";
+	cout << endl;
+	cout << "6. Quit";
 	cout << endl;
 	cout << "Please selection an option using numerical values.";
 	cout << endl;
@@ -1449,12 +1483,107 @@ double updateTime(clock_t startTime)
     return (clock() - startTime) / (double) CLOCKS_PER_SEC;
 }
 
+// updates the highscore list with the user's points
+void updateHighscores(string name, int points)
+{
+    //read in highscore list from text file
+    ifstream in;
+    in.open("highscores.txt");
+
+    string names[10];
+    int scores[10];
+    int place = 0;
+
+    while(!in.eof())
+    {
+        in >> names[place];
+        in >> scores[place];
+        place++;
+    }
+
+    //check to see if the new score can be on the highscore list
+    bool isHigh = false;
+
+    for(int i = 0; i < 10; i++)
+    {
+        if(points > scores[i])
+        {
+            isHigh = true;
+            break;
+        }
+    }
+
+    //add the new score if it can be on the highscore list
+    if(isHigh)
+    {
+        //create new list and add old values
+        string newNames[11];
+        int newScores[11];
+        for(int i = 0; i < 10; i++)
+        {
+            newNames[i] = names[i];
+            newScores[i] = scores[i];
+        }
+
+        //add new score to end of list
+        newNames[10] = name;
+        newScores[10] = points;
+
+        //sort list using bubble sort
+        for(int i = 0; i < 10; i++)
+        {
+            for(int j = i + 1; j < 11; j++)
+            {
+                string tempName;
+                int tempScore;
+
+                if(newScores[i] < newScores[j])
+                {
+                    tempName = newNames[i];
+                    newNames[i] = newNames[j];
+                    newNames[j] = tempName;
+
+                    tempScore = newScores[i];
+                    newScores[i] = newScores[j];
+                    newScores[j] = tempScore;
+                }
+            }
+        }
+
+        //add values back to old list
+        for(int i = 0; i < 10; i++)
+        {
+            names[i] = newNames[i];
+            scores[i] = newScores[i];
+        }
+    }
+
+    //write the highscores back to the text file
+    ofstream out;
+    out.open("highscores.txt");
+
+    for(int i = 0; i < 10; i++)
+    {
+        out << names[i];
+        out << endl;
+        out << scores[i];
+        if(i != 9)
+        {
+            out << endl;
+        }
+    }
+
+    out.close();
+}
+
 // forward declaration for methods that call each other
 void Choice1(user player);
 
 void Choice2(user player);
 
 void Choice3(user player);
+
+void viewHighscores();
 
 // method for running the first floor of the game
 void Choice3(user player)
@@ -1514,17 +1643,26 @@ void Choice3(user player)
 
     if(winner)
     {
+        updateHighscores(player.getName() ,player.getPoints());
+
         cout << endl;
         cout << "You did it!";
         cout << endl;
         cout << "You made it out the building!";
+        cout << endl;
+        cout << "You earned ";
+        cout << player.getPoints();
+        cout << " points.";
         cout << endl;
         cout << "Would you like to start the game over or return to the main menu?";
         cout << endl;
         cout << endl;
         cout << "1. Start game over.";
         cout << endl;
-        cout << "2. Return to main menu.";
+        cout << "2. View Highscores";
+        cout << endl;
+        cout << "3. Return to main menu.";
+        cout << endl;
         cin >> roomChoice;
 
         if(roomChoice.compare("1") == 0)
@@ -1533,6 +1671,10 @@ void Choice3(user player)
             Choice1(player);
         }
         else if(roomChoice.compare("2") == 0)
+        {
+            viewHighscores();
+        }
+        else if(roomChoice.compare("3") == 0)
         {
             //once the method ends, the user will automatically return to the main menu
         }
@@ -1835,12 +1977,38 @@ void StartGame(user player)
     string name;
     cout << endl;
     cout << "Let's get started! ";
-    cout << "What's your name?";
-    cout << endl;
-    cin >> name;
+
+    bool doContinue = false;
+
+    do
+    {
+        cout << endl;
+        cout << "Enter a 3 character name";
+        cout << endl;
+        cin >> name;
+
+        if(name.size() == 3)
+        {
+            doContinue = true;
+        }
+        else if(name.size() < 3)
+        {
+            cout << "Error: The name you entered was too short.";
+            cout << endl;
+        }
+        else if(name.size() > 3)
+        {
+            cout << "Error: The name you entered was too long.";
+            cout << endl;
+        }
+
+    }while(!doContinue);
+
     player.setName(name);
 
-    cout << "Hi " << player.getName();
+    cout << "Hi ";
+    cout << player.getName();
+    cout << "!";
     cout << endl;
 
     //game instructions
@@ -1921,9 +2089,11 @@ user openSettings(user player)
         cout << endl;
         cout << "1. View Current Time Limits";
         cout << endl;
-        cout << "2. Edit a time limit";
+        cout << "2. Set Time Limits back to default";
         cout << endl;
-        cout << "3. Return to the main menu";
+        cout << "3. Edit a time limit";
+        cout << endl;
+        cout << "4. Return to the main menu";
         cout << endl;
         cin >> choice;
 
@@ -1931,11 +2101,22 @@ user openSettings(user player)
         {
             player.displayTimeConstrainsts();
 
-            cout << "Type anything and press enter to return to the main menu";
+            cout << "Type anything and press enter to return to the settings menu";
             cout << endl;
             cin >> choice;
         }
         else if(choice.compare("2") == 0)
+        {
+            player.defaultTimeConstraints();
+
+            cout << endl;
+            cout << "Time Limits successfully set back to default!";
+            cout << endl;
+            cout << "Type anything and press enter to return to the settings menu";
+            cout << endl;
+            cin >> choice;
+        }
+        else if(choice.compare("3") == 0)
         {
             bool doContinue2 = false;
 
@@ -2070,7 +2251,7 @@ user openSettings(user player)
                 }
             }while(!doContinue2);
         }
-        else if(choice.compare("3") == 0)
+        else if(choice.compare("4") == 0)
         {
             doContinue = true;
         }
@@ -2082,6 +2263,39 @@ user openSettings(user player)
     }while(!doContinue);
 
     return player;
+}
+
+// displays game highscores
+void viewHighscores()
+{
+    ifstream in;
+    in.open("highscores.txt");
+
+    string name;
+    int score;
+    int place = 1;
+
+    cout << endl;
+    cout << "Highscores";
+    cout << endl;
+    while(!in.eof())
+    {
+        in >> name;
+        in >> score;
+
+        cout << place;
+        cout << ".";
+        cout << name;
+        cout << " ";
+        cout << score;
+        cout << endl;
+
+        place++;
+    }
+
+    cout << "Type anything and press enter to return to the main menu";
+    cout << endl;
+    cin >> name;
 }
 
 // displays game credits
@@ -2130,13 +2344,18 @@ int main()
         {
             player = openSettings(player);
         }
-        //Display credits for the game
+        //Displays the highscores from previous players
         else if(choice.compare("4") == 0)
+        {
+            viewHighscores();
+        }
+        //Display credits for the game
+        else if(choice.compare("5") == 0)
         {
             displayCredits();
         }
         //Quit Game
-        else if(choice.compare("5") == 0)
+        else if(choice.compare("6") == 0)
         {
             keepRunning = Quit();
         }
