@@ -8,10 +8,11 @@
 #include <limits>
 #include <fstream>
 #include <iomanip>
+#include <cstring>
 
 using namespace std;
 
-string to_string(int i)
+string toString(int i)
 {
     stringstream ss;
     ss << i;
@@ -378,6 +379,12 @@ void building::generateFirstFloor()
               timeDecreaser == key || timeDecreaser == firstFauxKey || timeDecreaser == secondFauxKey ||
               timeDecreaser == thirdFauxKey || timeDecreaser == riddle);
 
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+        rooms[thirdFauxKey] = "faux key";
+        rooms[timeDecreaser] = "time decreaser";
+
         //generate riddle based on key not being in one certain room
         int emptyRoom;
 
@@ -387,13 +394,7 @@ void building::generateFirstFloor()
         }
         while(rooms[emptyRoom] != "empty");
 
-        rooms[riddle] = "The key is not inside of room " + to_string(emptyRoom + 1) + ".";
-
-        rooms[key] = "key";
-        rooms[firstFauxKey] = "faux key";
-        rooms[secondFauxKey] = "faux key";
-        rooms[thirdFauxKey] = "faux key";
-        rooms[timeDecreaser] = "time decreaser";
+        rooms[riddle] = "The key is not inside of room " + toString(emptyRoom + 1) + ".";
     }
     else
     {
@@ -425,6 +426,11 @@ void building::generateFirstFloor()
               || thirdFauxKey == key || thirdFauxKey == firstFauxKey || thirdFauxKey == secondFauxKey
               || thirdFauxKey == riddle);
 
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+        rooms[thirdFauxKey] = "faux key";
+
         //generate riddle based on key not being in one certain room
         int emptyRoom;
 
@@ -434,12 +440,7 @@ void building::generateFirstFloor()
         }
         while(rooms[emptyRoom] != "empty");
 
-        rooms[riddle] = "The key is not inside of room " + to_string(emptyRoom + 1) + ".";
-
-        rooms[key] = "key";
-        rooms[firstFauxKey] = "faux key";
-        rooms[secondFauxKey] = "faux key";
-        rooms[thirdFauxKey] = "faux key";
+        rooms[riddle] = "The key is not inside of room " + toString(emptyRoom + 1) + ".";
     }
 }
 
@@ -2707,110 +2708,125 @@ user openSettings(user player)
                     do
                     {
                         bool inputFail;
+                        string tester;
                         double newTime;
 
                         do
                         {
-                            cout << endl;
-                            cout << "Enter a new time limit";
-                            cout << endl;
-                            cin >> newTime;
+                        	inputFail = false;
 
-                            inputFail = cin.fail();
-                            cin.clear();
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            cout << endl;
+                            cout << "Enter a new time limit (integer value)";
+                            cout << endl;
+                            cin >> tester;
 
-                            if(inputFail == true)
+                            for(int i = 0; i < tester.length(); i++)
+                            {
+								if(int(tester.at(i)) < 48 || int(tester.at(i)) > 57)
+								{
+									inputFail = true;
+								}
+                            }
+
+                            if(inputFail)
                             {
                                 cout << "Error: You entered an incorrect option!";
                                 cout << endl;
                             }
-                        }while(inputFail == true);
+                            else
+                            {
+                                char tab2[1024];
+                                strcpy(tab2, tester.c_str());
+                                newTime = atof(tab2);
+                            }
+                        }while(inputFail);
 
-                        if(newTime < 0)
-                        {
-                            cout << "Error: Your time limit cannot be less than 0!";
-                            cout << endl;
-                        }
-                        else
-                        {
-                            doContinue2 = true;
-                            player.setTimeConstraints(0 ,newTime);
-                        }
+                        doContinue2 = true;
+                        player.setTimeConstraints(0 ,newTime);
                     }while(!doContinue2);
                 }
                 else if(choice.compare("2") == 0)
                 {
                     do
                     {
-                        bool inputFail;
-                        double newTime;
+                    	bool inputFail;
+						string tester;
+						double newTime;
 
-                        do
-                        {
-                            cout << endl;
-                            cout << "Enter a new time limit";
-                            cout << endl;
-                            cin >> newTime;
+						do
+						{
+							inputFail = false;
 
-                            inputFail = cin.fail();
-                            cin.clear();
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+							cout << endl;
+							cout << "Enter a new time limit (integer value)";
+							cout << endl;
+							cin >> tester;
 
-                            if(inputFail == true)
-                            {
-                                cout << "Error: You entered an incorrect option!";
-                                cout << endl;
-                            }
-                        }while(inputFail == true);
+							for(int i = 0; i < tester.length(); i++)
+							{
+								if(int(tester.at(i)) < 48 || int(tester.at(i)) > 57)
+								{
+									inputFail = true;
+								}
+							}
 
-                        if(newTime < 0)
-                        {
-                            cout << "Error: Your time limit cannot be less than 0!";
-                            cout << endl;
-                        }
-                        else
-                        {
-                            doContinue2 = true;
-                            player.setTimeConstraints(1 ,newTime);
-                        }
+							if(inputFail)
+							{
+								cout << "Error: You entered an incorrect option!";
+								cout << endl;
+							}
+							else
+							{
+								char tab2[1024];
+								strcpy(tab2, tester.c_str());
+								newTime = atof(tab2);
+							}
+						}while(inputFail);
+
+						doContinue2 = true;
+						player.setTimeConstraints(1 ,newTime);
                     }while(!doContinue2);
                 }
                 else if(choice.compare("3") == 0)
                 {
                     do
                     {
-                        bool inputFail;
-                        double newTime;
+                    	bool inputFail;
+						string tester;
+						double newTime;
 
-                        do
-                        {
-                            cout << endl;
-                            cout << "Enter a new time limit";
-                            cout << endl;
-                            cin >> newTime;
+						do
+						{
+							inputFail = false;
 
-                            inputFail = cin.fail();
-                            cin.clear();
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+							cout << endl;
+							cout << "Enter a new time limit (integer value)";
+							cout << endl;
+							cin >> tester;
 
-                            if(inputFail == true)
-                            {
-                                cout << "Error: You entered an incorrect option!";
-                                cout << endl;
-                            }
-                        }while(inputFail == true);
+							for(int i = 0; i < tester.length(); i++)
+							{
+								if(int(tester.at(i)) < 48 || int(tester.at(i)) > 57)
+								{
+									inputFail = true;
+								}
+							}
 
-                        if(newTime < 0)
-                        {
-                            cout << "Error: Your time limit cannot be less than 0!";
-                            cout << endl;
-                        }
-                        else
-                        {
-                            doContinue2 = true;
-                            player.setTimeConstraints(2 ,newTime);
-                        }
+							if(inputFail)
+							{
+								cout << "Error: You entered an incorrect option!";
+								cout << endl;
+							}
+							else
+							{
+								char tab2[1024];
+								strcpy(tab2, tester.c_str());
+								newTime = atof(tab2);
+							}
+						}while(inputFail);
+
+						doContinue2 = true;
+						player.setTimeConstraints(2 ,newTime);
                     }while(!doContinue2);
                 }
                 else
