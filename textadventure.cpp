@@ -7,6 +7,7 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ user::user()
     timeConstraints[0] = 60;
     timeConstraints[1] = 40;
     timeConstraints[2] = 30;
+    timeDecreaser = 0;
 }
 
 // assigns user a name
@@ -70,12 +72,6 @@ void user::decreaseLives()
 void user::decrementPoints()
 {
     points--;
-}
-
-// updates the user's amount of points
-void user::addPoints(int n)
-{
-    points += n;
 }
 
 //returns the amount of points the user has
@@ -144,149 +140,314 @@ void user::displayTimeConstrainsts()
     cout << endl;
 }
 
+// sets the amount of time taken away from the user
+void user::setTimeDecreaser(double t)
+{
+    timeDecreaser = t;
+}
+
+// returns the amount of time take away from the user
+double user::getTimeDecreaser()
+{
+    return timeDecreaser;
+}
+
 //////////////USER CLASS METHODS ABOVE/////////////////////
 
 //////////////BUILDING CLASS METHODS BELOW/////////////////////
 
+// constructor for predefining the randFloor integer
+building::building()
+{
+    srand(time(0));
+    randFloor = rand()%3;
+}
+
 // randomly creates the rooms of the third floor
 // with properties of holding a key, holding a
-// a faux key, holding a riddle, and being empty
+// a faux key, holding a riddle, being empty,
+// and possibly a room that decreases the remaining time
 void building::generateThirdFloor()
 {
-    //automatically assign all rooms empty
-    for(int i = 0; i < 8; i++)
+    if(randFloor == 0)
     {
-        rooms[i] = "empty";
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
+
+        //4 different random numbers to assign which room for a key, a faux key, a riddle, and a time decreaser
+        int key;
+        int fauxKey;
+        int riddle;
+        int timeDecreaser;
+
+        srand(time(0));
+        key = rand()%10;
+
+        do
+        {
+            fauxKey = rand()%10;
+            riddle = rand()%10;
+            timeDecreaser = rand()%10;
+        }
+        while(key == fauxKey || key == riddle || riddle == fauxKey ||
+              timeDecreaser == key || timeDecreaser == fauxKey || timeDecreaser == riddle);
+
+        //generate riddle based on key being in an even or odd number room
+        if((key + 1)%2 == 0)
+        {
+            rooms[riddle] = "The key is inside of an even numbered room.";
+        }
+        else if((key + 1)%2 != 0)
+        {
+            rooms[riddle] = "The key is inside of an odd numbered room.";
+        }
+
+        rooms[key] = "key";
+        rooms[fauxKey] = "faux key";
+        rooms[timeDecreaser] = "time decreaser";
     }
-
-    //3 different random numbers to assign which room for a key, a faux key, and a riddle
-    int key;
-    int fauxKey;
-    int riddle;
-
-    srand(time(0));
-    key = rand()%8;
-
-    do
+    else
     {
-        fauxKey = rand()%8;
-        riddle = rand()%8;
-    }
-    while(key == fauxKey || key == riddle || riddle == fauxKey);
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
 
-    //generate riddle based on key being in an even or odd number room
-    if((key + 1)%2 == 0)
-    {
-        rooms[riddle] = "The key is inside of an even numbered room.";
-    }
-    else if((key + 1)%2 != 0)
-    {
-        rooms[riddle] = "The key is inside of an odd numbered room.";
-    }
+        //3 different random numbers to assign which room for a key, a faux key, and a riddle
+        int key;
+        int fauxKey;
+        int riddle;
 
-    rooms[key] = "key";
-    rooms[fauxKey] = "faux key";
+        srand(time(0));
+        key = rand()%10;
+
+        do
+        {
+            fauxKey = rand()%10;
+            riddle = rand()%10;
+        }
+        while(key == fauxKey || key == riddle || riddle == fauxKey);
+
+        //generate riddle based on key being in an even or odd number room
+        if((key + 1)%2 == 0)
+        {
+            rooms[riddle] = "The key is inside of an even numbered room.";
+        }
+        else if((key + 1)%2 != 0)
+        {
+            rooms[riddle] = "The key is inside of an odd numbered room.";
+        }
+
+        rooms[key] = "key";
+        rooms[fauxKey] = "faux key";
+    }
 }
 
 // randomly creates the rooms of the second floor
 // with properties of holding a key, holding 2
-// faux keys, holding a riddle, and being empty
+// faux keys, holding a riddle, being empty,
+// and possibly a room that decreases the remaining time
 void building::generateSecondFloor()
 {
-    //automatically assign all rooms empty
-    for(int i = 0; i < 8; i++)
+    if(randFloor == 1)
     {
-        rooms[i] = "empty";
-    }
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
 
-    //4 different random numbers to assign which room for a key, 2 faux keys, and a riddle
-    int key;
-    int firstFauxKey;
-    int secondFauxKey;
-    int riddle;
+        //5 different random numbers to assign which room for a key, 2 faux keys, a riddle, and a time decreaser
+        int key;
+        int firstFauxKey;
+        int secondFauxKey;
+        int riddle;
+        int timeDecreaser;
 
-    srand(time(0));
-    key = rand()%8;
+        srand(time(0));
+        key = rand()%10;
 
-    do
-    {
-        firstFauxKey = rand()%8;
-        secondFauxKey = rand()%8;
-        riddle = rand()%8;
-    }
-    while(key == firstFauxKey || key == secondFauxKey || key == riddle
-          || firstFauxKey == secondFauxKey || firstFauxKey == riddle || secondFauxKey == riddle);
+        do
+        {
+            firstFauxKey = rand()%10;
+            secondFauxKey = rand()%10;
+            riddle = rand()%10;
+            timeDecreaser = rand()%10;
+        }
+        while(key == firstFauxKey || key == secondFauxKey || key == riddle || firstFauxKey == secondFauxKey ||
+              firstFauxKey == riddle || secondFauxKey == riddle || timeDecreaser == key ||
+              timeDecreaser == firstFauxKey || timeDecreaser == secondFauxKey || timeDecreaser == riddle);
 
-    //generate riddle based on key being in an adjacent room to the riddle or not
-    if(key == (riddle - 1) || key == (riddle + 1))
-    {
-        rooms[riddle] = "The key is inside of an adjacent room to this room.";
+        //generate riddle based on key being in an adjacent room to the riddle or not
+        if(key == (riddle - 1) || key == (riddle + 1))
+        {
+            rooms[riddle] = "The key is inside of an adjacent room to this room.";
+        }
+        else
+        {
+            rooms[riddle] = "The key is not inside of an adjacent room to this room.";
+        }
+
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+        rooms[timeDecreaser] = "time decreaser";
     }
     else
     {
-        rooms[riddle] = "The key is not inside of an adjacent room to this room.";
-    }
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
 
-    rooms[key] = "key";
-    rooms[firstFauxKey] = "faux key";
-    rooms[secondFauxKey] = "faux key";
+        //4 different random numbers to assign which room for a key, 2 faux keys, and a riddle
+        int key;
+        int firstFauxKey;
+        int secondFauxKey;
+        int riddle;
+
+        srand(time(0));
+        key = rand()%10;
+
+        do
+        {
+            firstFauxKey = rand()%10;
+            secondFauxKey = rand()%10;
+            riddle = rand()%10;
+        }
+        while(key == firstFauxKey || key == secondFauxKey || key == riddle
+              || firstFauxKey == secondFauxKey || firstFauxKey == riddle || secondFauxKey == riddle);
+
+        //generate riddle based on key being in an adjacent room to the riddle or not
+        if(key == (riddle - 1) || key == (riddle + 1))
+        {
+            rooms[riddle] = "The key is inside of an adjacent room to this room.";
+        }
+        else
+        {
+            rooms[riddle] = "The key is not inside of an adjacent room to this room.";
+        }
+
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+    }
 }
 
 // randomly creates the rooms of the first floor
 // with properties of holding a key, holding 3
-// faux keys, holding a riddle, and being empty
+// faux keys, holding a riddle, being empty,
+// and possibly a room that decreases the remaining time
 void building::generateFirstFloor()
 {
-    //automatically assign all rooms empty
-    for(int i = 0; i < 8; i++)
+    if(randFloor == 2)
     {
-        rooms[i] = "empty";
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
+
+        //6 different random numbers to assign which room for a key, 3 faux keys, a riddle, and time decreaser
+        int key;
+        int firstFauxKey;
+        int secondFauxKey;
+        int thirdFauxKey;
+        int riddle;
+        int timeDecreaser;
+
+        srand(time(0));
+        key = rand()%10;
+
+        do
+        {
+            firstFauxKey = rand()%10;
+            secondFauxKey = rand()%10;
+            thirdFauxKey = rand()%10;
+            riddle = rand()%10;
+            timeDecreaser = rand()%10;
+        }
+        while(key == firstFauxKey || key == secondFauxKey || key == riddle || firstFauxKey == secondFauxKey ||
+              firstFauxKey == riddle || secondFauxKey == riddle || thirdFauxKey == key ||
+              thirdFauxKey == firstFauxKey || thirdFauxKey == secondFauxKey || thirdFauxKey == riddle ||
+              timeDecreaser == key || timeDecreaser == firstFauxKey || timeDecreaser == secondFauxKey ||
+              timeDecreaser == thirdFauxKey || timeDecreaser == riddle);
+
+        //generate riddle based on key not being in one certain room
+        int emptyRoom;
+
+        do
+        {
+            emptyRoom = rand()%10;
+        }
+        while(rooms[emptyRoom] != "empty");
+
+        rooms[riddle] = "The key is not inside of room " + to_string(emptyRoom + 1) + ".";
+
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+        rooms[thirdFauxKey] = "faux key";
+        rooms[timeDecreaser] = "time decreaser";
     }
-
-    //4 different random numbers to assign which room for a key, 3 faux keys, and a riddle
-    int key;
-    int firstFauxKey;
-    int secondFauxKey;
-    int thirdFauxKey;
-    int riddle;
-
-    srand(time(0));
-    key = rand()%8;
-
-    do
+    else
     {
-        firstFauxKey = rand()%8;
-        secondFauxKey = rand()%8;
-        thirdFauxKey = rand()%8;
-        riddle = rand()%8;
+        //automatically assign all rooms empty
+        for(int i = 0; i < 10; i++)
+        {
+            rooms[i] = "empty";
+        }
+
+        //4 different random numbers to assign which room for a key, 3 faux keys, and a riddle
+        int key;
+        int firstFauxKey;
+        int secondFauxKey;
+        int thirdFauxKey;
+        int riddle;
+
+        srand(time(0));
+        key = rand()%10;
+
+        do
+        {
+            firstFauxKey = rand()%10;
+            secondFauxKey = rand()%10;
+            thirdFauxKey = rand()%10;
+            riddle = rand()%10;
+        }
+        while(key == firstFauxKey || key == secondFauxKey || key == riddle
+              || firstFauxKey == secondFauxKey || firstFauxKey == riddle || secondFauxKey == riddle
+              || thirdFauxKey == key || thirdFauxKey == firstFauxKey || thirdFauxKey == secondFauxKey
+              || thirdFauxKey == riddle);
+
+        //generate riddle based on key not being in one certain room
+        int emptyRoom;
+
+        do
+        {
+            emptyRoom = rand()%10;
+        }
+        while(rooms[emptyRoom] != "empty");
+
+        rooms[riddle] = "The key is not inside of room " + to_string(emptyRoom + 1) + ".";
+
+        rooms[key] = "key";
+        rooms[firstFauxKey] = "faux key";
+        rooms[secondFauxKey] = "faux key";
+        rooms[thirdFauxKey] = "faux key";
     }
-    while(key == firstFauxKey || key == secondFauxKey || key == riddle
-          || firstFauxKey == secondFauxKey || firstFauxKey == riddle || secondFauxKey == riddle
-          || thirdFauxKey == key || thirdFauxKey == firstFauxKey || thirdFauxKey == secondFauxKey
-          || thirdFauxKey == riddle);
-
-    //generate riddle based on key not being in one certain room
-    int emptyRoom;
-
-    do
-    {
-        emptyRoom = rand()%8;
-    }
-    while(rooms[emptyRoom] != "empty");
-
-    rooms[riddle] = "The key is not inside of room " + to_string(emptyRoom + 1) + ".";
-
-    rooms[key] = "key";
-    rooms[firstFauxKey] = "faux key";
-    rooms[secondFauxKey] = "faux key";
-    rooms[thirdFauxKey] = "faux key";
 }
 
 // method for searching the room the user selects,
 // seeing what it holds (key, faux key, or riddle),
 // giving the user an option of picking up a key,
 // or trying to open the staircase door
-user building::searchRoom(user player, string roomChoice)
+user building::searchRoom(user player, string roomChoice, double timeRemaining)
 {
     string option;
     bool doContinue;
@@ -421,6 +582,15 @@ user building::searchRoom(user player, string roomChoice)
                 }
             }while(!doContinue);
 
+            return player;
+        }
+        else if(rooms[0].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
             return player;
         }
         else
@@ -564,6 +734,15 @@ user building::searchRoom(user player, string roomChoice)
 
             return player;
         }
+        else if(rooms[1].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
         else
         {
             cout << endl;
@@ -703,6 +882,15 @@ user building::searchRoom(user player, string roomChoice)
                 }
             }while(!doContinue);
 
+            return player;
+        }
+        else if(rooms[2].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
             return player;
         }
         else
@@ -846,6 +1034,15 @@ user building::searchRoom(user player, string roomChoice)
 
             return player;
         }
+        else if(rooms[3].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
         else
         {
             cout << endl;
@@ -985,6 +1182,15 @@ user building::searchRoom(user player, string roomChoice)
                 }
             }while(!doContinue);
 
+            return player;
+        }
+        else if(rooms[4].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
             return player;
         }
         else
@@ -1128,6 +1334,15 @@ user building::searchRoom(user player, string roomChoice)
 
             return player;
         }
+        else if(rooms[5].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
         else
         {
             cout << endl;
@@ -1267,6 +1482,15 @@ user building::searchRoom(user player, string roomChoice)
                 }
             }while(!doContinue);
 
+            return player;
+        }
+        else if(rooms[6].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
             return player;
         }
         else
@@ -1410,6 +1634,15 @@ user building::searchRoom(user player, string roomChoice)
 
             return player;
         }
+        else if(rooms[7].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
         else
         {
             cout << endl;
@@ -1420,6 +1653,306 @@ user building::searchRoom(user player, string roomChoice)
         }
     }
     else if(roomChoice.compare("9") == 0)
+    {
+        if(rooms[8].compare("empty") == 0)
+        {
+            cout << endl;
+            cout << "Room 9 is empty";
+            return player;
+        }
+        else if(rooms[8].compare("faux key") == 0)
+        {
+            doContinue = false;
+
+            do
+            {
+                cout << endl;
+                cout << "You found a key!";
+                cout << endl;
+                cout << "Do you want to pick the key up?";
+                cout << endl;
+                cout << "1. Yes";
+                cout << endl;
+                cout << "2. No";
+                cout << endl;
+                cin >> option;
+
+                if(option.compare("1") == 0)
+                {
+                    if(player.getObject().compare("key") == 0)
+                    {
+                        rooms[8] = "key";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("faux key") == 0)
+                    {
+                        rooms[8] = "faux key";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("") == 0)
+                    {
+                        rooms[8] = "empty";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "The key is in your possession.";
+                    }
+
+                    doContinue = true;
+                }
+                else if(option.compare("2") == 0)
+                {
+                    cout << endl;
+                    cout << "The key is not in your possession.";
+                    doContinue = true;
+                }
+                else
+                {
+                    cout << "Error: You entered an incorrect option!";
+                    cout << endl;
+                }
+            }while(!doContinue);
+
+            return player;
+        }
+        else if(rooms[8].compare("key") == 0)
+        {
+            doContinue = false;
+
+            do
+            {
+                cout << endl;
+                cout << "You found a key!";
+                cout << endl;
+                cout << "Do you want to pick the key up?";
+                cout << endl;
+                cout << "1. Yes";
+                cout << endl;
+                cout << "2. No";
+                cout << endl;
+                cin >> option;
+
+                if(option.compare("1") == 0)
+                {
+                    if(player.getObject().compare("key") == 0)
+                    {
+                        rooms[8] = "key";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("faux key") == 0)
+                    {
+                        rooms[8] = "faux key";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("") == 0)
+                    {
+                        rooms[8] = "empty";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "The key is in your possession.";
+                    }
+
+                    doContinue = true;
+                }
+                else if(option.compare("2") == 0)
+                {
+                    cout << endl;
+                    cout << "The key is not in your possession.";
+                    doContinue = true;
+                }
+                else
+                {
+                    cout << "Error: You entered an incorrect option!";
+                    cout << endl;
+                }
+            }while(!doContinue);
+
+            return player;
+        }
+        else if(rooms[8].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
+        else
+        {
+            cout << endl;
+            cout << "You found a riddle! It reads:";
+            cout << endl;
+            cout << rooms[8];
+            return player;
+        }
+    }
+    else if(roomChoice.compare("10") == 0)
+    {
+        if(rooms[9].compare("empty") == 0)
+        {
+            cout << endl;
+            cout << "Room 10 is empty";
+            return player;
+        }
+        else if(rooms[9].compare("faux key") == 0)
+        {
+            doContinue = false;
+
+            do
+            {
+                cout << endl;
+                cout << "You found a key!";
+                cout << endl;
+                cout << "Do you want to pick the key up?";
+                cout << endl;
+                cout << "1. Yes";
+                cout << endl;
+                cout << "2. No";
+                cout << endl;
+                cin >> option;
+
+                if(option.compare("1") == 0)
+                {
+                    if(player.getObject().compare("key") == 0)
+                    {
+                        rooms[9] = "key";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("faux key") == 0)
+                    {
+                        rooms[9] = "faux key";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("") == 0)
+                    {
+                        rooms[9] = "empty";
+                        player.setObject("faux key");
+                        cout << endl;
+                        cout << "The key is in your possession.";
+                    }
+
+                    doContinue = true;
+                }
+                else if(option.compare("2") == 0)
+                {
+                    cout << endl;
+                    cout << "The key is not in your possession.";
+                    doContinue = true;
+                }
+                else
+                {
+                    cout << "Error: You entered an incorrect option!";
+                    cout << endl;
+                }
+            }while(!doContinue);
+
+            return player;
+        }
+        else if(rooms[9].compare("key") == 0)
+        {
+            doContinue = false;
+
+            do
+            {
+                cout << endl;
+                cout << "You found a key!";
+                cout << endl;
+                cout << "Do you want to pick the key up?";
+                cout << endl;
+                cout << "1. Yes";
+                cout << endl;
+                cout << "2. No";
+                cout << endl;
+                cin >> option;
+
+                if(option.compare("1") == 0)
+                {
+                    if(player.getObject().compare("key") == 0)
+                    {
+                        rooms[9] = "key";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("faux key") == 0)
+                    {
+                        rooms[9] = "faux key";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "You dropped the key you had and";
+                        cout << endl;
+                        cout << "the new key is in your possession.";
+                    }
+                    else if(player.getObject().compare("") == 0)
+                    {
+                        rooms[9] = "empty";
+                        player.setObject("key");
+                        cout << endl;
+                        cout << "The key is in your possession.";
+                    }
+
+                    doContinue = true;
+                }
+                else if(option.compare("2") == 0)
+                {
+                    cout << endl;
+                    cout << "The key is not in your possession.";
+                    doContinue = true;
+                }
+                else
+                {
+                    cout << "Error: You entered an incorrect option!";
+                    cout << endl;
+                }
+            }while(!doContinue);
+
+            return player;
+        }
+        else if(rooms[9].compare("time decreaser") == 0)
+        {
+            player.setTimeDecreaser(timeRemaining/4);
+            cout << endl;
+            cout << "Oh no! The guard saw you on the camera in this room.";
+            cout << endl;
+            cout << "A fourth of your remaining time will be taken away";
+            return player;
+        }
+        else
+        {
+            cout << endl;
+            cout << "You found a riddle! It reads:";
+            cout << endl;
+            cout << rooms[9];
+            return player;
+        }
+    }
+    else if(roomChoice.compare("11") == 0)
     {
         if(player.getObject().compare("") == 0)
         {
@@ -1489,6 +2022,28 @@ void updateHighscores(string name, int points)
     //read in highscore list from text file
     ifstream in;
     in.open("highscores.txt");
+
+    if(in.fail())
+    {
+        ofstream out;
+        out.open("highscores.txt");
+
+        for(int i = 0; i < 9; i++)
+        {
+            out << "AAA";
+            out << endl;
+            out << "0";
+            out << endl;
+        }
+
+        out << "AAA";
+        out << endl;
+        out << "0";
+
+        out.close();
+
+        in.open("highscores.txt");
+    }
 
     string names[10];
     int scores[10];
@@ -1583,6 +2138,8 @@ void Choice2(user player);
 
 void Choice3(user player);
 
+void createHighscoreTextFile();
+
 void viewHighscores();
 
 // method for running the first floor of the game
@@ -1590,6 +2147,7 @@ void Choice3(user player)
 {
     building prison;
     prison.generateFirstFloor();
+    player.setTimeDecreaser(0);
 
     cout << endl;
     cout << "Your time starts now!";
@@ -1623,23 +2181,27 @@ void Choice3(user player)
         cout << endl;
         cout << "8. Search Room 8.";
         cout << endl;
-        cout << "9. Try to exit the floor.";
+        cout << "9. Search Room 9.";
+        cout << endl;
+        cout << "10. Search Room 10.";
+        cout << endl;
+        cout << "11. Try to exit the floor.";
         cout << endl;
         cout << "Time remaining: ";
-        cout << player.getFirstFloorTimeLimit() - updateTime(startTime);
+        cout << player.getFirstFloorTimeLimit() - updateTime(startTime) - player.getTimeDecreaser();
         cout << " seconds";
         cout << endl;
         cin >> roomChoice;
         duration = updateTime(startTime);
-        if(duration < player.getFirstFloorTimeLimit())
+        if(duration < player.getFirstFloorTimeLimit() - player.getTimeDecreaser())
         {
-            player = prison.searchRoom(player, roomChoice);
+            player = prison.searchRoom(player, roomChoice, player.getThirdFloorTimeLimit() - duration);
         }
         if(player.getObject().compare("winner") == 0)
         {
             winner = true;
         }
-    }while(!winner && updateTime(startTime) < player.getFirstFloorTimeLimit());
+    }while(!winner && updateTime(startTime) < player.getFirstFloorTimeLimit() - player.getTimeDecreaser());
 
     if(winner)
     {
@@ -1737,6 +2299,7 @@ void Choice2(user player)
 {
     building prison;
     prison.generateSecondFloor();
+    player.setTimeDecreaser(0);
 
     cout << endl;
     cout << "Your time starts now!";
@@ -1770,23 +2333,27 @@ void Choice2(user player)
         cout << endl;
         cout << "8. Search Room 8.";
         cout << endl;
-        cout << "9. Try to exit the floor.";
+        cout << "9. Search Room 9.";
+        cout << endl;
+        cout << "10. Search Room 10.";
+        cout << endl;
+        cout << "11. Try to exit the floor.";
         cout << endl;
         cout << "Time remaining: ";
-        cout << player.getSecondFloorTimeLimit() - updateTime(startTime);
+        cout << player.getSecondFloorTimeLimit() - updateTime(startTime) - player.getTimeDecreaser();
         cout << " seconds";
         cout << endl;
         cin >> roomChoice;
         duration = updateTime(startTime);
-        if(duration < player.getSecondFloorTimeLimit())
+        if(duration < player.getSecondFloorTimeLimit() - player.getTimeDecreaser())
         {
-            player = prison.searchRoom(player, roomChoice);
+            player = prison.searchRoom(player, roomChoice, player.getThirdFloorTimeLimit() - duration);
         }
         if(player.getObject().compare("winner") == 0)
         {
             winner = true;
         }
-    }while(!winner && updateTime(startTime) < player.getSecondFloorTimeLimit());
+    }while(!winner && updateTime(startTime) < player.getSecondFloorTimeLimit() - player.getTimeDecreaser());
 
     if(winner)
     {
@@ -1856,6 +2423,7 @@ void Choice1(user player)
 {
     building prison;
     prison.generateThirdFloor();
+    player.setTimeDecreaser(0);
 
     cout << endl;
     cout << "Your time starts now!";
@@ -1889,23 +2457,27 @@ void Choice1(user player)
         cout << endl;
         cout << "8. Search Room 8.";
         cout << endl;
-        cout << "9. Try to exit the floor.";
+        cout << "9. Search Room 9.";
+        cout << endl;
+        cout << "10. Search Room 10.";
+        cout << endl;
+        cout << "11. Try to exit the floor.";
         cout << endl;
         cout << "Time remaining: ";
-        cout << player.getThirdFloorTimeLimit() - updateTime(startTime);
+        cout << player.getThirdFloorTimeLimit() - updateTime(startTime) - player.getTimeDecreaser();
         cout << " seconds";
         cout << endl;
         cin >> roomChoice;
         duration = updateTime(startTime);
-        if(duration < player.getThirdFloorTimeLimit())
+        if(duration < player.getThirdFloorTimeLimit() - player.getTimeDecreaser())
         {
-            player = prison.searchRoom(player, roomChoice);
+            player = prison.searchRoom(player, roomChoice, player.getThirdFloorTimeLimit() - duration);
         }
         if(player.getObject().compare("winner") == 0)
         {
             winner = true;
         }
-    }while(!winner && updateTime(startTime) < player.getThirdFloorTimeLimit());
+    }while(!winner && updateTime(startTime) < player.getThirdFloorTimeLimit() - player.getTimeDecreaser());
 
     if(winner)
     {
@@ -2006,37 +2578,32 @@ void StartGame(user player)
 
     player.setName(name);
 
+    cout << endl;
     cout << "Hi ";
     cout << player.getName();
     cout << "!";
     cout << endl;
+    cout << "Here are the rules of the game...";
+    cout << endl;
 
     //game instructions
-    cout << "You will try to escape each floor of the game.";
+    cout << "1. You will try to escape each floor of the game.";
     cout << endl;
-    cout << "You will have to search each room";
+    cout << "2. You will have to search each room to find the key to the staircase.";
     cout << endl;
-    cout << "to find the key to the staircase.";
+    cout << "3. Keep in mind there are multiple keys on each floor,";
     cout << endl;
-    cout << "Keep in mind there are multiple keys on each floor,";
+    cout << "   but there is only one key to the staircase.";
     cout << endl;
-    cout << "but there is one only key to the staircase";
+    cout << "4. You can only hold onto one key at a time.";
     cout << endl;
-    cout << "Also, you can only hold onto one key at a time.";
+    cout << "5. You will be timed for each floor.";
     cout << endl;
-    cout << "The last room you entered with a key is the key you'll have in your possession.";
+    cout << "6. A guard can see you on the security camera in certain rooms,";
     cout << endl;
-    cout << "You will be timed for each floor.";
+    cout << "   which will decrease your remaining time by a quarter.";
     cout << endl;
-    cout << "60 seconds on the third floor,";
-    cout << endl;
-    cout << "40 seconds on the second floor,";
-    cout << endl;
-    cout << "and 30 seconds on the first floor to escape.";
-    cout << endl;
-    cout << "Also, you have 3 lives,";
-    cout << endl;
-    cout << "so you don't have to repeat previous floors if you don't make it in time.";
+    cout << "7. You have 3 lives for the entire game.";
     cout << endl;
     cout << "Are you ready to play?";
     cout << endl;
@@ -2058,17 +2625,19 @@ void displayTutorial()
     cout << endl;
     cout << "About/Tutorial!";
     cout << endl;
-    cout << "In this game the player must find there way through a 3 story prison";
+    cout << "In this game the player must find their way through a 3 story prison";
     cout << endl;
     cout << "filled with guards and riddles to help them find their way out.";
     cout << endl;
-    cout << "At the start of the game the player will find themselves in a room on the";
+    cout << "At the start of the game the player will find themselves in a hallway on";
     cout << endl;
-    cout << "3rd floor of building. The player must search the the rooms, while avoiding the guards,";
+    cout << "the 3rd floor of building. The player must search the the rooms, while";
     cout << endl;
-    cout << "to find the right key that unlocks the room that sends the player down to the next floor.";
+    cout << "avoiding the guards, to find the right key that unlocks the room that sends";
     cout << endl;
-    cout << "The objective is to find the key on each floor to get to the ground floor and escape the prison.";
+    cout << "the player down to the next floor. The objective is to find the key on each ";
+    cout << endl;
+    cout << "floor to get to the ground floor and escape the prison.";
     cout << endl;
 
     cout << "Type anything and press enter to return to the main menu";
@@ -2265,37 +2834,68 @@ user openSettings(user player)
     return player;
 }
 
+// generates a highscore list text file if none is to be found
+void createHighscoreTextFile()
+{
+    ofstream out;
+    out.open("highscores.txt");
+
+    for(int i = 0; i < 9; i++)
+    {
+        out << "AAA";
+        out << endl;
+        out << "0";
+        out << endl;
+    }
+
+    out << "AAA";
+    out << endl;
+    out << "0";
+
+    out.close();
+
+    viewHighscores();
+}
+
 // displays game highscores
 void viewHighscores()
 {
     ifstream in;
     in.open("highscores.txt");
 
-    string name;
-    int score;
-    int place = 1;
-
-    cout << endl;
-    cout << "Highscores";
-    cout << endl;
-    while(!in.eof())
+    if(in.fail())
     {
-        in >> name;
-        in >> score;
-
-        cout << place;
-        cout << ".";
-        cout << name;
-        cout << " ";
-        cout << score;
-        cout << endl;
-
-        place++;
+        in.close();
+        createHighscoreTextFile();
     }
+    else
+    {
+        string name;
+        int score;
+        int place = 1;
 
-    cout << "Type anything and press enter to return to the main menu";
-    cout << endl;
-    cin >> name;
+        cout << endl;
+        cout << "Highscores";
+        cout << endl;
+        while(!in.eof())
+        {
+            in >> name;
+            in >> score;
+
+            cout << place;
+            cout << ".";
+            cout << name;
+            cout << " ";
+            cout << score;
+            cout << endl;
+
+            place++;
+        }
+
+        cout << "Type anything and press enter to return to the main menu";
+        cout << endl;
+        cin >> name;
+    }
 }
 
 // displays game credits
@@ -2305,6 +2905,78 @@ void displayCredits()
 
     //game credits
     cout << endl;
+    cout << "CREDITS";
+    cout << endl;
+	cout << "This project was created for a Programming Fundamentals 2 (COP3503) assignment";
+	cout << endl;
+	cout << "Written in C++";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Lead Programmers:";
+	cout << setw(15);
+	cout << "Kareem Hunte";
+	cout << endl;
+	cout << setw(31);
+	cout << "Alex Brandt";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Project Managers:";
+	cout << setw(20);
+	cout << "Prakash Pudhucode";
+	cout << endl;
+	cout << " ";
+	cout << setw(30);
+	cout << "Stanley Tan";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Testers:";
+	cout << setw(24);
+	cout << "Pryana Lewis";
+	cout << endl;
+	cout << setw(34);
+	cout << "Arthur Johnson";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Creative Director:";
+	cout << setw(16);
+	cout << "Arthur Johnson";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Level Designers: ";
+	cout << setw(20);
+	cout << "Prakash Pudhucode";
+	cout << endl;
+	cout << setw(34);
+	cout << "Arthur Johnson";
+	cout << endl;
+	cout << " ";
+	cout << endl;
+	cout << "Programmers:";
+	cout << setw(20);
+	cout << "Pryana Lewis";
+	cout << endl;
+	cout << setw(37);
+	cout << "Prakash Pudhucode";
+	cout << endl;
+	cout << setw(31);
+	cout << "Stanley Tan";
+	cout << endl;
+	cout << setw(31);
+	cout << "Alex Brandt";
+	cout << endl;
+	cout << setw(34);
+	cout << "Arthur Johnson";
+	cout << endl;
+	cout << setw(32);
+	cout << "Kareem Hunte";
+	cout << endl;
+	cout << " ";
+	cout << endl;
 
     cout << "Type anything and press enter to return to the main menu";
     cout << endl;
