@@ -16,7 +16,6 @@ class user
         int getLives();
         void decreaseLives();
         void decrementPoints();
-        void addPoints(int n);
         int getPoints();
         void playerReset();
         void setTimeConstraints(int floor, double time);
@@ -25,6 +24,8 @@ class user
         double getSecondFloorTimeLimit();
         double getFirstFloorTimeLimit();
         void displayTimeConstrainsts();
+        void setTimeDecreaser(double t);
+        double getTimeDecreaser();
 
     private:
         string name;
@@ -32,19 +33,21 @@ class user
         int points;
         int lives;
         double timeConstraints[3];
+        double timeDecreaser;
 };
 
 // building class for creating and keeping track of the game properties
 class building
 {
     public:
+        building();
         void generateThirdFloor();
         void generateSecondFloor();
         void generateFirstFloor();
-        void generateBonusRound();
-        user searchRoom(user player, string roomChoice);
+        user searchRoom(user player, string roomChoice, double timeRemaining);
     private:
-        string rooms[8];
+        string rooms[10];
+        int randFloor;
 };
 
 #endif // TEXTADVENTURE_H
